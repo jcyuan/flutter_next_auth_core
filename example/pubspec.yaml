@@ -1,0 +1,25 @@
+name: flutter_next_auth_example
+description: Minimal example for flutter_next_auth.
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ">=3.10.4 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Only for the example HttpClient implementation
+  dio: ^5.0.0
+
+  flutter_next_auth:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
