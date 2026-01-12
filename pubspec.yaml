@@ -1,0 +1,11 @@
+name: flutter_next_auth
+version: 0.0.1
+publish_to: none
+environment:
+  sdk: ">=3.10.4 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+
+  event_bus: ^2.0.0
+  flutter_secure_storage: ^10.0.0
