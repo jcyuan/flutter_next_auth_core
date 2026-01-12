@@ -1,6 +1,10 @@
 name: flutter_next_auth
-version: 0.0.1
+description: Frontend authentication module, integrated with the NextAuth backend; the frontend API is kept consistent with the NextAuth frontend API.
+version: 1.0.0
 publish_to: none
+repository: https://github.com/jcyuan/flutter_next_auth
+issue_tracker: https://github.com/jcyuan/flutter_next_auth/issues
+homepage: https://github.com/jcyuan/flutter_next_auth#readme
 environment:
   sdk: ">=3.10.4 <4.0.0"
 dependencies:
