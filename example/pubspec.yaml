@@ -1,20 +1,20 @@
-name: flutter_next_auth_example
-description: Minimal example for flutter_next_auth.
-publish_to: none
-version: 0.0.1
+name: next_auth_client_example
+description: A minimal example demonstrating NextAuthClient initialization
+publish_to: 'none'
+
+version: 1.0.0+1
 
 environment:
-  sdk: ">=3.10.4 <4.0.0"
+  sdk: ^3.10.4
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # Only for the example HttpClient implementation
-  dio: ^5.0.0
-
+  dio: ^5.1.1
+  google_sign_in: ^7.2.0
   flutter_next_auth:
-    path: ../
+    path: ../../flutter_next_auth
 
 dev_dependencies:
   flutter_test:
@@ -22,4 +22,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
