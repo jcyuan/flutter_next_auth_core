@@ -11,6 +11,10 @@ It wraps common NextAuth client capabilities (`csrf` / `session` / `signin` / `s
 
 > Note: this package only defines an abstract `HttpClient`. You must implement it in your app (using `dio`, `http`, etc).
 
+Demo video
+
+https://github.com/user-attachments/assets/e061abd7-552d-48df-818f-6082a53c06ef
+
 ---
 
 ## 📦 Installation
@@ -25,7 +29,7 @@ flutter pub add flutter_next_auth_core
 
 ```yaml
 dependencies:
-  flutter_next_auth_core: ^1.0.0
+  flutter_next_auth_core: ^1.0.5
 ```
 
 Then run:
