@@ -1,9 +1,9 @@
 name: flutter_next_auth_core
 description: This is a Flutter client library for quickly integrating with NextAuth v4.x backend authorization APIs.
-version: 1.0.2
-repository: https://github.com/jcyuan/flutter_next_auth
-issue_tracker: https://github.com/jcyuan/flutter_next_auth/issues
-homepage: https://github.com/jcyuan/flutter_next_auth#readme
+version: 1.0.3
+repository: https://github.com/jcyuan/flutter_next_auth_core
+issue_tracker: https://github.com/jcyuan/flutter_next_auth_core/issues
+homepage: https://github.com/jcyuan/flutter_next_auth_core#readme
 environment:
   sdk: ">=3.10.4 <4.0.0"
 dependencies:
