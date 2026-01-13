@@ -2,6 +2,7 @@ import 'package:flutter_next_auth_core/core/utils/session_serializer.dart';
 import 'package:flutter_next_auth_core/http/http_client.dart';
 import 'package:flutter_next_auth_core/utils/logger.dart';
 
+/// Configuration for NextAuth client
 class NextAuthConfig<T> {
   /// server address (required)
   final String domain;
@@ -24,6 +25,7 @@ class NextAuthConfig<T> {
   /// server CSRF cookie name (optional, must same as the one in the server， default: __Host-next-auth.csrf-token for HTTPS, next-auth.csrf-token for HTTP)
   final String serverCSRFTokenCookieName;
 
+  /// Creates a NextAuth configuration
   NextAuthConfig({
     required this.domain,
     this.authBasePath = '/api/auth',

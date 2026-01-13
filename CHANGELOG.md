@@ -14,3 +14,7 @@
 ## 1.0.3 - 2026-1-13
 
 - Updated repository URLs
+
+## 1.0.4 - 2026-1-14
+
+- Improve docs

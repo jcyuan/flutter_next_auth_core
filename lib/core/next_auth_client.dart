@@ -57,6 +57,7 @@ class NextAuthClient<T> {
     _initialized = true;
   }
 
+  /// Gets the NextAuth configuration
   NextAuthConfig get config => _config;
 
   /// Setter for status with notification
@@ -75,7 +76,10 @@ class NextAuthClient<T> {
     }
   }
 
+  /// Gets the current session status
   SessionStatus get status => _status;
+  
+  /// Gets the current session data
   T? get session => _session;
 
   /// Refetch session from server (for example to refresh local version)
@@ -125,6 +129,7 @@ class NextAuthClient<T> {
     return response;
   }
 
+  /// Signs out the current user
   Future<void> signOut() async {
     if (_session == null) {
       return;
@@ -139,6 +144,7 @@ class NextAuthClient<T> {
     _eventBus.fire(SignedOutEvent());
   }
 
+  /// Updates the current session with new data
   Future<T?> updateSession(Map<String, dynamic> data) async {
     final updatedSession = await _authService.updateSession(data);
     if (updatedSession != null) {
@@ -147,22 +153,27 @@ class NextAuthClient<T> {
     return updatedSession;
   }
 
+  /// Gets the CSRF token for authentication requests
   Future<String?> getCSRFToken({bool forceNew = false}) async {
     return await _authService.getCSRFToken(forceNew: forceNew);
   }
 
+  /// Sets a custom logger instance
   void setLogger(Logger logger) {
     _logger = logger;
   }
 
+  /// Registers an OAuth provider for authentication
   void registerOAuthProvider(String providerId, OAuthProvider provider) {
     _oauthRegistry.registerOAuthProvider(providerId, provider);
   }
 
+  /// Removes an OAuth provider
   void removeOAuthProvider(String providerId) {
     _oauthRegistry.removeOAuthProvider(providerId);
   }
 
+  /// Gets the event bus for listening to authentication events
   EventBus get eventBus => _eventBus;
 
   Future<void> _loadSession() async {
