@@ -213,3 +213,8 @@ export default NextAuth({
   }
 })
 ```
+
+## See also
+
+**Riverpod integration**: [https://github.com/jcyuan/flutter_next_auth_riverpod](https://github.com/jcyuan/flutter_next_auth_riverpod)  
+**BLoC integration**: [https://github.com/jcyuan/flutter_next_auth_bloc](https://github.com/jcyuan/flutter_next_auth_bloc)
