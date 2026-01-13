@@ -16,8 +16,8 @@ import 'package:flutter_next_auth_core/utils/logger.dart';
 
 /// NextAuth client instance
 /// Create an instance and use it to manage authentication
-class NextAuthClient<T extends Map<String, dynamic>> {
-  final NextAuthConfig<T> _config;
+class NextAuthClient<T> {
+  final NextAuthConfig _config;
   late final AuthService<T> _authService;
   late final OAuthProviderRegistry _oauthRegistry;
   late final EventBus _eventBus;
@@ -57,7 +57,7 @@ class NextAuthClient<T extends Map<String, dynamic>> {
     _initialized = true;
   }
 
-  NextAuthConfig<T> get config => _config;
+  NextAuthConfig get config => _config;
 
   /// Setter for status with notification
   set _setStatus(SessionStatus value) {
@@ -71,7 +71,7 @@ class NextAuthClient<T extends Map<String, dynamic>> {
   set _setSession(T? value) {
     if (_session != value) {
       _session = value;
-      _eventBus.fire(SessionChangedEvent(_session));
+      _eventBus.fire(SessionChangedEvent<T>(_session));
     }
   }
 

@@ -103,7 +103,7 @@ The following APIs are consistent with the NextAuth.js client API behavior.
       - **IMPORTANT**: Save the jwt token from `event.accessToken.token` for backend API authorization
     - `SignedOutEvent`: Fired when user signs out
     - `StatusChangedEvent`: Fired when session status changes
-    - `SessionChangedEvent`: Fired when session data changes
+    - `SessionChangedEvent<T>`: Fired when session data changes
 
 ### Event Handling
 

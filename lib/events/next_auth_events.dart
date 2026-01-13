@@ -22,8 +22,8 @@ class StatusChangedEvent extends NextAuthEvent {
 }
 
 /// Event fired when session data changes
-class SessionChangedEvent extends NextAuthEvent {
-  final Map<String, dynamic>? session;
+class SessionChangedEvent<T> extends NextAuthEvent {
+  final T? session;
 
   SessionChangedEvent(this.session);
 }

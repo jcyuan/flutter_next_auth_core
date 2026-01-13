@@ -12,13 +12,13 @@ import 'package:flutter_next_auth_core/oauth/oauth_provider_registry.dart';
 import 'package:flutter_next_auth_core/utils/api_utils.dart' show apiBaseUrl;
 import 'package:flutter_next_auth_core/utils/logger.dart';
 
-class AuthService<T extends Map<String, dynamic>> {
-  final NextAuthConfig<T> _config;
+class AuthService<T> {
+  final NextAuthConfig _config;
   final OAuthProviderRegistry _oauthRegistry;
   final TokenCache _tokenCache;
 
   AuthService({
-    required NextAuthConfig<T> config,
+    required NextAuthConfig config,
     required OAuthProviderRegistry oauthRegistry,
     required TokenCache tokenCache,
   }) : _config = config,

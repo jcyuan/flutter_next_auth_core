@@ -8,7 +8,7 @@ import 'package:next_auth_client_example/simple_dio_httpclient.dart';
 // NextAuthClient initialization example
 void main() {
   // create configuration with cookie name comments
-  final config = NextAuthConfig<Map<String, dynamic>>(
+  final config = NextAuthConfig(
     domain: 'https://example.com',
     authBasePath: '/api/auth',
     httpClient: SimpleDioHttpClient(),
@@ -52,7 +52,7 @@ void main() {
   //     contains accessToken (Token object with jwt token string and expiration)
   //   - SignedOutEvent: fired when user signs out
   //   - StatusChangedEvent: fired when session status changes
-  //   - SessionChangedEvent: fired when session data changes
+  //   - SessionChangedEvent<T>: fired when session data changes
   final eventBus = nextAuthClient.eventBus;
 
   // listen to SignIn event - save jwt token for backend API authorization
