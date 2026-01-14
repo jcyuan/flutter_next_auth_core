@@ -7,10 +7,6 @@ import { safeInputJson } from '@/libs/api/input';
 import { apiError, apiSuccess } from '@/libs/api/result';
 import { authOptions } from '@/libs/auth/options';
 import logger from '@/libs/logger';
-import { exchangeOAuthCode } from '@/libs/oauth/callback';
-import { createOAuthClient } from '@/libs/oauth/client';
-import { OAuthProvider, oauthProviders } from '@/libs/oauth/providers';
-import { verifyIdToken } from '@/libs/oauth/verify-idtoken';
 import { getClientIp } from '@/libs/request-ip';
 import { CustomErrorCode } from '@/types/api';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
@@ -21,6 +17,11 @@ import type { OAuthConfig } from 'next-auth/providers/oauth';
 import { NextRequest } from 'next/server';
 import { TokenSet } from 'openid-client';
 import { verifyTurnstileToken } from '@/utils/turnstile';
+
+import { exchangeOAuthCode } from './lib/oauth/callback';
+import { createOAuthClient } from './lib/oauth/client';
+import { OAuthProvider, oauthProviders } from './lib/oauth/providers';
+import { verifyIdToken } from './lib/oauth/verify-idtoken';
 
 const prismaAdapter = PrismaAdapter(prisma);
 
