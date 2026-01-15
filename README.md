@@ -15,6 +15,8 @@ Demo video
 
 https://github.com/user-attachments/assets/e061abd7-552d-48df-818f-6082a53c06ef
 
+https://github.com/user-attachments/assets/ce6d6c48-efb6-4649-867e-37765a6e20fe
+
 ---
 
 ## 📦 Installation

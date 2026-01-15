@@ -30,3 +30,7 @@
 ## 1.0.7
 
 - Add backend OAuth module example codes
+
+## 1.1.0
+
+- Added mail login support

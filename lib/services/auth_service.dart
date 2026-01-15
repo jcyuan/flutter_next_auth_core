@@ -28,7 +28,8 @@ class AuthService<T> {
   Logger? get logger => _config.logger;
 
   /// Sign in with email, credentials or OAuth provider
-  /// - email: sign in with email (you are responsible for sending the verification code to the user, and then provide the token & email to the signIn method)
+  /// - email: sign in with email (If the token is missing in emailOptions, a verification code will be sent to the email and a token will be returned. 
+  ///          Otherwise, the server-side sign-in process will be invoked. Therefore, the email sign-in flow requires calling this method twice.)
   /// - credentials: sign in with credentials (you are responsible for providing the credentials to the signIn method)
   /// - OAuth provider: sign in with OAuth provider (you are responsible for implementing the OAuth provider)
   Future<SignInResponse> signIn(
@@ -74,26 +75,146 @@ class AuthService<T> {
   }
 
   Future<SignInResponse> _signInWithEmail(EmailSignInOptions options) async {
-    final queryParams = options.toJson();
-    final queryString = Uri(queryParameters: queryParams).query;
-    final url = apiBaseUrl(
-      _config.domain,
-      _config.authBasePath,
-      'callback/email',
+    if (options.email.isEmpty) {
+      throw ArgumentError('email is required');
+    }
+
+    if (options.token == null || options.token!.isEmpty) {
+      // Send verification code to email
+      final url = apiBaseUrl(
+        _config.domain,
+        _config.authBasePath,
+        'signin/email',
+      );
+
+      final response = await _config.httpClient.post(
+        url,
+        body: {
+          'email': options.email,
+          'csrfToken': await getCSRFToken(),
+          ...options.toJson(),
+          'json': true,
+        },
+        options: HttpClientOptions(
+          contentType: 'application/x-www-form-urlencoded',
+          responseType: HttpClientResponseType.json,
+          cookies: await _getCookieList(),
+          headers: {'login-client': 'app'}
+        )
+      );
+
+      return _handleEmailSendingResponse(response);
+    } else {
+      // Verify verification code
+      final url = apiBaseUrl(
+        _config.domain,
+        _config.authBasePath,
+        'callback/email',
+      );
+
+      final queryParams = {
+        'email': options.email,
+        'token': options.token!,
+      };
+      final urlWithParams = Uri.parse(url).replace(
+        queryParameters: queryParams,
+      ).toString();
+
+      final response = await _config.httpClient.get(
+        urlWithParams,
+        options: HttpClientOptions(
+          cookies: await _getCookieList(),
+          headers: {'login-client': 'app'},
+          followRedirects: false,
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      return _handleEmailVerificationResponse(response);
+    }
+  }
+  
+  Future<SignInResponse> _handleEmailSendingResponse(
+    HttpResponse response,
+  ) async {
+    final body = response.body as Map<String, dynamic>?;
+    final url = body?['url'] as String?;
+
+    if (response.statusCode == 200 &&
+        url != null &&
+        url.isNotEmpty &&
+        url.toLowerCase().contains('verify-request')) {
+      await _cacheCSRFCookieFromHeaders(response);
+      return SignInResponse(ok: true, status: 200);
+    } else {
+      String? errorMessage;
+      if (url != null && url.isNotEmpty) {
+        try {
+          final responseUrl = Uri.parse(url);
+          errorMessage = responseUrl.queryParameters['error'];
+        } catch (_) {}
+      }
+
+      logger?.error('email sending response error: $errorMessage');
+
+      return SignInResponse(
+        error: SignInError(
+          code: SignInErrorCode.serverError,
+          exception: SignInException('auth.email.error-send-verification-failed'),
+        ),
+        status: response.statusCode ?? 500,
+        ok: false,
+      );
+    }
+  }
+  
+  Future<SignInResponse> _handleEmailVerificationResponse(
+    HttpResponse response,
+  ) async {
+    final headers = response.headers;
+    final cookies = headers['set-cookie'];
+    final accessToken = cookies?.firstWhere(
+      (element) => element.startsWith('${_config.serverSessionCookieName}='),
+      orElse: () => '',
     );
 
-    final fullUrl = '$url?$queryString';
+    if (accessToken != null && accessToken.isNotEmpty) {
+      final accessTokenValue = _parseCookieValue(accessToken);
+      final accessTokenExpiresAt = _parseCookieExpiration(accessToken);
+      await _tokenCache.setAccessToken(
+        accessTokenValue,
+        expiresAt: accessTokenExpiresAt,
+      );
 
-    final response = await _config.httpClient.post(
-      fullUrl,
-      options: HttpClientOptions(
-        contentType: 'application/json',
-        cookies: await _getCookieList(),
-        headers: {'login-client': 'app'},
-      ),
-    );
+      // cache csrf token
+      await _cacheCSRFCookieFromHeaders(response);
 
-    return await _handleSignInResponse(response);
+      return SignInResponse(ok: true, status: 200);
+    } else {
+      String? errorMessage;
+      if (response.statusCode == 302) {
+        final location = headers['location']?.firstOrNull;
+        if (location != null && location.isNotEmpty) {
+          try {
+            final locationUrl = Uri.parse(location);
+            errorMessage = locationUrl.queryParameters['error'];
+          } catch (_) {}
+        }
+      }
+
+      logger?.error('email verification response error: $errorMessage');
+
+      return SignInResponse(
+        error: SignInError(
+          code: SignInErrorCode.invalidLogin,
+          exception: SignInException('auth.email.error-verification-failed'),
+        ),
+        status: response.statusCode ?? 500,
+        ok: false,
+      );
+    }
   }
 
   Future<Map<String, String>?> _getCookieList({
@@ -140,6 +261,7 @@ class AuthService<T> {
         responseType: HttpClientResponseType.json,
         cookies: await _getCookieList(),
         headers: {'login-client': 'app'},
+        followRedirects: false,
         validateStatus: (status) {
           return status != null && status < 500;
         },
@@ -155,7 +277,7 @@ class AuthService<T> {
   ) async {
     final oauthProvider = _oauthRegistry.getProvider(provider);
     if (oauthProvider == null) {
-      throw Exception(
+      throw ArgumentError(
         'OAuth provider $provider not found, please register your own OAuth provider',
       );
     }
@@ -243,7 +365,7 @@ class AuthService<T> {
             return expiresAt.millisecondsSinceEpoch;
           }
         } catch (e) {
-          logger?.warn('Failed to parse Max-Age: $maxAgeValue');
+          logger?.warn('Failed to parse Max-Age: $maxAgeValue, error: $e');
         }
       } else if (trimmed.startsWith('expires=') && expiresValue == null) {
         final expiresDateValue = part.trim().substring(8).trim();
@@ -263,7 +385,7 @@ class AuthService<T> {
           }
           expiresValue = date.millisecondsSinceEpoch;
         } catch (e) {
-          logger?.warn('Failed to parse Expires date: $expiresDateValue');
+          logger?.warn('Failed to parse Expires date: $expiresDateValue, error: $e');
         }
       }
     }
@@ -424,6 +546,7 @@ class AuthService<T> {
     }
   }
 
+  /// Update session data
   Future<T?> updateSession(Map<String, dynamic> data) async {
     try {
       final url = apiBaseUrl(_config.domain, _config.authBasePath, 'session');
@@ -450,6 +573,7 @@ class AuthService<T> {
     }
   }
 
+  /// request CSRF token from server
   Future<String?> getCSRFToken({bool forceNew = false}) async {
     // 1, get from cache first
     if (!forceNew) {
@@ -476,6 +600,7 @@ class AuthService<T> {
     }
   }
 
+  /// get session data from server
   Future<T?> getSession() async {
     try {
       final url = apiBaseUrl(_config.domain, _config.authBasePath, 'session');

@@ -3,24 +3,36 @@ class EmailSignInOptions {
   /// User email address
   final String email;
   
-  /// Verification code
-  final String code;
+  /// Verification token
+  /// If the token is missing in emailOptions, a verification code will be sent to the email,
+  /// otherwise the server-side sign-in process will be invoked.
+  final String? token;
   
-  /// Optional Turnstile token for bot protection
+  /// Optional Turnstile token for bot protection by your server
   final String? turnstileToken;
+
+  /// Optional locale for the email sign-in process
+  final String? locale;
 
   /// Creates email sign in options
   EmailSignInOptions({
     required this.email,
-    required this.code,
+    this.token,
     this.turnstileToken,
+    this.locale,
   });
 
   /// Converts to JSON map
   Map<String, String> toJson() {
-    final params = {'email': email, 'code': code};
+    final params = {'email': email };
+    if (token != null) {
+      params['token'] = token!;
+    }
     if (turnstileToken != null) {
       params['turnstile'] = turnstileToken!;
+    }
+    if (locale != null) {
+      params['locale'] = locale!;
     }
     return params;
   }

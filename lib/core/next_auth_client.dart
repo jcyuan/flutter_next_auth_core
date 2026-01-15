@@ -89,6 +89,10 @@ class NextAuthClient<T> {
 
   /// Sign in with email, credentials or OAuth provider<br/>
   /// NOTE: this method must be called in a user interaction context (e.g. button press, tap, etc.)
+  /// - email: sign in with email (If the token is missing in emailOptions, a verification code will be sent to the email, 
+  ///          otherwise the server-side sign-in process will be invoked. Therefore, the email sign-in flow requires calling this method twice.)
+  /// - credentials: sign in with credentials (you are responsible for providing the credentials to the signIn method)
+  /// - OAuth provider: sign in with OAuth provider (you are responsible for implementing the OAuth provider)
   Future<SignInResponse> signIn(
     String provider, {
     EmailSignInOptions? emailOptions,
@@ -103,6 +107,11 @@ class NextAuthClient<T> {
     );
 
     if (response.ok) {
+      if (provider == 'email' && emailOptions?.token == null) {
+        // return the response directly because this is the first step of the email sign-in flow
+        return response;
+      }
+
       final accessToken = await _tokenCache.getAccessToken();
       if (accessToken != null && accessToken.isValid) {
         _eventBus.fire(SignedInEvent(accessToken));
