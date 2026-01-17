@@ -21,7 +21,7 @@ class NextAuthClient<T> {
   late final AuthService _authService;
   late final OAuthProviderRegistry _oauthRegistry;
   late final EventBus _eventBus;
-  late final TokenCache _tokenCache;
+  late final TokenCache tokenCache;
   Logger? _logger;
 
   T? _session;
@@ -31,11 +31,11 @@ class NextAuthClient<T> {
 
   NextAuthClient(this._config) {
     _oauthRegistry = OAuthProviderRegistry();
-    _tokenCache = TokenCache();
+    tokenCache = TokenCache();
     _authService = AuthService(
       config: _config,
       oauthRegistry: _oauthRegistry,
-      tokenCache: _tokenCache,
+      tokenCache: tokenCache,
     );
     _logger = _config.logger;
     _eventBus = EventBus();
@@ -48,9 +48,9 @@ class NextAuthClient<T> {
   Future<void> recoverLoginStatusFromCache() async {
     if (_initialized) return;
     // Initialize token cache from storage
-    await _tokenCache.initialize();
+    await tokenCache.initialize();
     // Try to load session on initialization
-    final accessToken = await _tokenCache.getAccessToken();
+    final accessToken = await tokenCache.getAccessToken();
     if (accessToken != null && accessToken.isValid) {
       await _loadSession();
     }
@@ -112,7 +112,7 @@ class NextAuthClient<T> {
         return response;
       }
 
-      final accessToken = await _tokenCache.getAccessToken();
+      final accessToken = await tokenCache.getAccessToken();
       if (accessToken != null && accessToken.isValid) {
         _eventBus.fire(SignedInEvent(accessToken));
 

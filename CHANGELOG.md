@@ -34,3 +34,7 @@
 ## 1.1.0
 
 - Added mail login support
+
+## 1.1.1
+
+- Expose `TokenCache` so that project can utilize these stored values
